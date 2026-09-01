@@ -1,14 +1,13 @@
-use crate::{retrier::Retrier, strategies::fixed_delay::FixedDelay};
+use crate::{retrier::Retrier, strategies::{expo::ExponentialDelay, fixed_delay::FixedDelay}};
 
 mod retrier;
 mod strategies;
 
 fn main() {
-    let retrier = Retrier::new(FixedDelay::new(std::time::Duration::from_secs(1)), 3);
+    let retrier = Retrier::new(ExponentialDelay::new(std::time::Duration::from_secs(1)), 5);
 
-    retrier.run(|| {
-        let status = std::process::Command::new("ping")
-            .args(["-c", "1", "google.com"])
+    let _ = retrier.run(|| {
+        let status = std::process::Command::new("false")
             .status()?;
 
         if status.success() {

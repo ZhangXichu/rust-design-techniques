@@ -1,5 +1,6 @@
 pub mod fixed_delay;
+pub mod expo;
 
 pub trait DelayStrategy {
-    fn delay(&self) -> std::time::Duration;
+    fn delay(&self, attempt: u32) -> std::time::Duration;
 }

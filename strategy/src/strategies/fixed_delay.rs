@@ -11,7 +11,8 @@ impl FixedDelay {
 }
 
 impl DelayStrategy for FixedDelay {
-    fn delay(&self) -> std::time::Duration {
+    fn delay(&self, attempt: u32) -> std::time::Duration {
+        let _ = attempt;
         self.delay
     }
 }
