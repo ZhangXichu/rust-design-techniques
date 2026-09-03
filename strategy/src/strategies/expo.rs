@@ -12,6 +12,6 @@ impl ExponentialDelay {
 
 impl DelayStrategy for ExponentialDelay {
     fn delay(&self, attempt: u32) -> std::time::Duration {
-        self.delay * 2.0f64.powf(attempt as f64) as u32
+        self.delay.saturating_mul(2u32.saturating_pow(attempt))
     }
 }
