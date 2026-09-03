@@ -1,19 +1,38 @@
-use crate::{retrier::Retrier, strategies::expo_with_jitter::ExponentialDelayWithJitter};
+use std::time::Duration;
+
+use crate::{
+    retrier::Retrier,
+    strategies::{
+        expo::ExponentialDelay, expo_with_jitter::ExponentialDelayWithJitter,
+        fixed_delay::FixedDelay, DelayStrategy,
+    },
+};
 
 mod retrier;
 mod strategies;
 
+fn failing_command() -> anyhow::Result<()> {
+    let status = std::process::Command::new("false").status()?;
+    if status.success() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!("Failed to execute"))
+    }
+}
+
+fn run_demo(name: &str, strategy: impl DelayStrategy + 'static) {
+    println!("\n=== {name} ===");
+    let retrier = Retrier::new(strategy, 4);
+    let _ = retrier.run(failing_command);
+}
+
 fn main() {
-    let retrier = Retrier::new(ExponentialDelayWithJitter::new(std::time::Duration::from_secs(1), std::time::Duration::from_secs(10)), 5);
+    let base = Duration::from_secs(1);
 
-    let _ = retrier.run(|| {
-        let status = std::process::Command::new("false")
-            .status()?;
-
-        if status.success() {
-            Ok(())
-        } else {
-            Err(anyhow::anyhow!("Failed to execute"))
-        }
-    });
+    run_demo("Fixed delay (1s)", FixedDelay::new(base));
+    run_demo("Exponential delay", ExponentialDelay::new(base));
+    run_demo(
+        "Exponential delay with jitter (cap 10s)",
+        ExponentialDelayWithJitter::new(base, Duration::from_secs(10)),
+    );
 }
