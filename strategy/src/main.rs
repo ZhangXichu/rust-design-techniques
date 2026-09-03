@@ -1,10 +1,10 @@
-use crate::{retrier::Retrier, strategies::{expo::ExponentialDelay, fixed_delay::FixedDelay}};
+use crate::{retrier::Retrier, strategies::expo_with_jitter::ExponentialDelayWithJitter};
 
 mod retrier;
 mod strategies;
 
 fn main() {
-    let retrier = Retrier::new(ExponentialDelay::new(std::time::Duration::from_secs(1)), 5);
+    let retrier = Retrier::new(ExponentialDelayWithJitter::new(std::time::Duration::from_secs(1), std::time::Duration::from_secs(10)), 5);
 
     let _ = retrier.run(|| {
         let status = std::process::Command::new("false")
