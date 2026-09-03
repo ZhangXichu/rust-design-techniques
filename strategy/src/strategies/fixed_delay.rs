@@ -1,5 +1,6 @@
 use super::DelayStrategy;
 
+/// Waits the same amount of time after every failure.
 pub struct FixedDelay {
     pub delay: std::time::Duration,
 }

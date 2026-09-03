@@ -1,5 +1,6 @@
 use super::DelayStrategy;
 
+/// Doubles the wait after every failure: `delay * 2^attempt`.
 pub struct ExponentialDelay {
     pub delay: std::time::Duration,
 }

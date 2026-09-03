@@ -2,6 +2,8 @@ use rand::Rng;
 
 use super::DelayStrategy;
 
+/// Doubles the wait, caps it, then picks a random time up to that, so that many
+/// clients retrying at once do not all come back in one wave.
 pub struct ExponentialDelayWithJitter {
     pub delay: std::time::Duration,
     pub cap: std::time::Duration,
