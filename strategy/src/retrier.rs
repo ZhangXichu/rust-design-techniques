@@ -25,7 +25,7 @@ impl Retrier {
                     if attempt >= self.max_attempts {
                         return Err(e);
                     }
-                    let delay_time = self.strategy.delay(attempt);
+                    let delay_time = self.strategy.delay(attempt-1);
 
                     println!("Attempt {} failed: {}, retrying in {} seconds", attempt, e, delay_time.as_secs());
                     
