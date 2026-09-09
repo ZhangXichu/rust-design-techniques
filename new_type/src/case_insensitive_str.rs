@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::fmt;
 use std::hash::{Hash, Hasher};
 
@@ -15,24 +14,18 @@ impl CaseInsensitiveString {
     }
 }
 
-// Custom equality behavior
 impl PartialEq for CaseInsensitiveString {
     fn eq(&self, other: &Self) -> bool {
-        self.0.eq_ignore_ascii_case(&other.0)
+        self.0.to_lowercase() == other.0.to_lowercase()
     }
 }
 
 impl Eq for CaseInsensitiveString {}
 
-// The trailing 0xff marks where this value ends -- without it, two of these in
-// a row feed one unbroken run of bytes and ("ab", "c") hashes the same as
-// ("a", "bc"). `str` uses the same byte for the same reason.
 impl Hash for CaseInsensitiveString {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        for byte in self.0.bytes() {
-            state.write_u8(byte.to_ascii_lowercase());
-        }
-        state.write_u8(0xff);
+        // Same mapping as `eq`. `String::hash` already writes the 0xff terminator.
+        self.0.to_lowercase().hash(state);
     }
 }
 
@@ -59,5 +52,22 @@ impl From<String> for CaseInsensitiveString {
 impl From<&str> for CaseInsensitiveString {
     fn from(value: &str) -> Self {
         Self(value.to_owned())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::HashMap;
+
+    #[test]
+    fn unicode_letters_are_equal() {
+        let upper = CaseInsensitiveString::from("Ä");
+        let lower = CaseInsensitiveString::from("ä");
+        assert_eq!(upper, lower);
+
+        let mut map = HashMap::new();
+        map.insert(upper, "ok");
+        assert_eq!(map[&lower], "ok");
     }
 }
