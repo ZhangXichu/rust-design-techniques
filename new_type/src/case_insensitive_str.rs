@@ -24,12 +24,15 @@ impl PartialEq for CaseInsensitiveString {
 
 impl Eq for CaseInsensitiveString {}
 
-// Custom hashing must follow the same rules as equality.
+// The trailing 0xff marks where this value ends -- without it, two of these in
+// a row feed one unbroken run of bytes and ("ab", "c") hashes the same as
+// ("a", "bc"). `str` uses the same byte for the same reason.
 impl Hash for CaseInsensitiveString {
     fn hash<H: Hasher>(&self, state: &mut H) {
         for byte in self.0.bytes() {
-            byte.to_ascii_lowercase().hash(state);
+            state.write_u8(byte.to_ascii_lowercase());
         }
+        state.write_u8(0xff);
     }
 }
 
