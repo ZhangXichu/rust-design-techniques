@@ -1,7 +1,7 @@
 use std::fmt;
 use std::hash::{Hash, Hasher};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct CaseInsensitiveString(String);
 
 impl CaseInsensitiveString {
@@ -32,14 +32,6 @@ impl Hash for CaseInsensitiveString {
 impl fmt::Display for CaseInsensitiveString {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
-    }
-}
-
-impl fmt::Debug for CaseInsensitiveString {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_tuple("CaseInsensitiveString")
-            .field(&self.0)
-            .finish()
     }
 }
 
