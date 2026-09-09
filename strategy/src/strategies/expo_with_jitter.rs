@@ -17,9 +17,11 @@ impl ExponentialDelayWithJitter {
 
 impl DelayStrategy for ExponentialDelayWithJitter {
     fn delay(&self, attempt: u32) -> std::time::Duration {
-        let exp = self.delay.saturating_mul(2u32.saturating_pow(attempt));
+        let exp: std::time::Duration = self.delay.saturating_mul(2u32.saturating_pow(attempt));
         let backoff = exp.min(self.cap);
-        let jitter_ms = rand::thread_rng().gen_range(0..=backoff.as_millis() as u64);
+        // this method can return 0 delay
+        let max_ms = u64::try_from(backoff.as_millis()).unwrap_or(u64::MAX);
+        let jitter_ms = rand::thread_rng().gen_range(1..=max_ms);
         std::time::Duration::from_millis(jitter_ms)
     }
 }

@@ -30,7 +30,7 @@ fn main() {
     let base = Duration::from_secs(1);
 
     run_demo("Fixed delay (1s)", FixedDelay::new(base));
-    run_demo("Exponential delay", ExponentialDelay::new(base));
+    run_demo("Exponential delay", ExponentialDelay::new(base, Duration::from_secs(10)));
     run_demo(
         "Exponential delay with jitter (cap 10s)",
         ExponentialDelayWithJitter::new(base, Duration::from_secs(10)),
