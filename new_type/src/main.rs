@@ -27,7 +27,6 @@ fn main() {
 
     println!("{}: {}", key, headers[&key]);
 
-    // Inserting this replaces the existing Content-Type entry.
     headers.insert(
         CaseInsensitiveString::from("content-TYPE"),
         "text/plain",
