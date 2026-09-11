@@ -24,7 +24,7 @@ impl Eq for CaseInsensitiveString {}
 
 impl Hash for CaseInsensitiveString {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        // Same mapping as `eq`. `String::hash` already writes the 0xff terminator.
+        // `String::hash` already writes the 0xff terminator.
         self.0.to_lowercase().hash(state);
     }
 }
@@ -51,15 +51,30 @@ impl From<&str> for CaseInsensitiveString {
 mod tests {
     use super::*;
     use std::collections::HashMap;
+    use std::hash::{Hash, Hasher};
+
+    fn hash_of(value: &CaseInsensitiveString) -> u64 {
+        let mut hasher = std::hash::DefaultHasher::new();
+        value.hash(&mut hasher);
+        hasher.finish()
+    }
 
     #[test]
-    fn unicode_letters_are_equal() {
+    fn unicode_letters_are_equal_and_hash_the_same() {
         let upper = CaseInsensitiveString::from("Ä");
         let lower = CaseInsensitiveString::from("ä");
         assert_eq!(upper, lower);
+        assert_eq!(hash_of(&upper), hash_of(&lower));
 
         let mut map = HashMap::new();
         map.insert(upper, "ok");
         assert_eq!(map[&lower], "ok");
+    }
+
+    #[test]
+    fn sharp_s_does_not_match_ss() {
+        let sharp_s = CaseInsensitiveString::from("ß");
+        let ss = CaseInsensitiveString::from("SS");
+        assert_ne!(sharp_s, ss);
     }
 }
